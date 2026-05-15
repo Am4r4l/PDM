@@ -90,7 +90,9 @@ fun LoginPage(modifier: Modifier = Modifier) {
                         FLAG_ACTIVITY_SINGLE_TOP
                     )
                 )
-            } ) {
+            },
+                enabled = email.isNotEmpty() && password.isNotEmpty() && password.length >= 8
+            ) {
                 Text("Login")
             }
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(horizontal = 4.dp))
