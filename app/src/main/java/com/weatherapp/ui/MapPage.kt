@@ -19,7 +19,7 @@ import com.weatherapp.ui.theme.WeatherAppTheme
 
 @Preview(showBackground = true)
 @Composable
-fun MapPage(modifier: Modifier = Modifier) {
+fun MapPage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     Column(
         modifier = modifier.fillMaxSize()
             .background(Color.Gray)

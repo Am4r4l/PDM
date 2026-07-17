@@ -19,7 +19,7 @@ import com.weatherapp.ui.theme.WeatherAppTheme
 
 @Preview(showBackground = true)
 @Composable
-fun HomePage(modifier: Modifier = Modifier) {
+fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
     Column(
         modifier = modifier.fillMaxSize()
             .background(Color.Blue)
