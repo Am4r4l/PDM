@@ -136,7 +136,6 @@ fun HomePage(modifier: Modifier = Modifier, finish: () -> Unit) {
         Button(
             onClick = {
                 Firebase.auth.signOut()
-                finish()
             },
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {

@@ -90,11 +90,6 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 Firebase.auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(activity) { task ->
                         if (task.isSuccessful) {
-                            activity.startActivity(
-                                Intent(activity, MainActivity::class.java).setFlags(
-                                    FLAG_ACTIVITY_SINGLE_TOP
-                                )
-                            )
                             Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
                         } else {
                             Toast.makeText(activity, "Login FALHOU!", Toast.LENGTH_LONG).show()
@@ -108,19 +103,11 @@ fun LoginPage(modifier: Modifier = Modifier) {
             }
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(horizontal = 4.dp))
             Button( onClick = {
-                Firebase.auth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(activity) { task ->
-                        if (task.isSuccessful) {
-                            activity.startActivity(
-                                Intent(activity, MainActivity::class.java).setFlags(
-                                    FLAG_ACTIVITY_SINGLE_TOP
-                                )
-                            )
-                            Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
-                        } else {
-                            Toast.makeText(activity, "Login FALHOU!", Toast.LENGTH_LONG).show()
-                        }
-                    }
+                activity?.startActivity(
+                    Intent(activity, RegisterActivity::class.java).setFlags(
+                        FLAG_ACTIVITY_SINGLE_TOP
+                    )
+                )
             } ) {
                 Text("Cadastre-se")
             }
