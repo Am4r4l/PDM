@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Weather App</string>
     <string name="title_activity_login">LoginActivity</string>
-    <string name="title_activity_register_acitivity">RegisterAcitivity</string>
+    <string name="title_activity_register_activity">RegisterActivity</string>
 </resources>

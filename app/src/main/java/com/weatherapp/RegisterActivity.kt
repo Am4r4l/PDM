@@ -1,7 +1,6 @@
 package com.weatherapp
 
-import android.content.Intent
-import android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -26,19 +25,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.weatherapp.ui.theme.WeatherAppTheme
 
-class RegisterAcitivity : ComponentActivity() {
+class RegisterActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             WeatherAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    RegisterPage()
+                    RegisterPage(modifier = Modifier.padding(innerPadding))
                 }
             }
         }
@@ -47,7 +47,7 @@ class RegisterAcitivity : ComponentActivity() {
 
 @Composable
 fun RegisterPage (modifier: Modifier = Modifier) {
-    val activity = LocalActivity.current
+    val activity: Activity = LocalActivity.current as Activity
     var name by rememberSaveable { mutableStateOf("")}
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -68,35 +68,46 @@ fun RegisterPage (modifier: Modifier = Modifier) {
         OutlinedTextField(
             value = name,
             label = { Text(text = "Digite seu nome") },
-            modifier = modifier,
+            modifier = Modifier.fillMaxWidth(),
             onValueChange = { name = it },
         )
         OutlinedTextField(
             value = email,
             label = { Text(text = "Digite seu e-mail") },
-            modifier = modifier,
+            modifier = Modifier.fillMaxWidth(),
             onValueChange = { email = it }
         )
         OutlinedTextField(
             value = password,
             label = { Text(text = "Digite sua senha") },
-            modifier = modifier,
+            modifier = Modifier.fillMaxWidth(),
             onValueChange = { password = it },
             visualTransformation = PasswordVisualTransformation()
         )
         OutlinedTextField(
             value = repeatPassword,
             label = { Text(text = "Repita sua senha") },
-            modifier = modifier,
+            modifier = Modifier.fillMaxWidth(),
             onValueChange = { repeatPassword = it },
             visualTransformation = PasswordVisualTransformation()
         )
 
         Button( onClick = {
-            Toast.makeText(activity, "Cadastrado com sucesso", Toast.LENGTH_LONG).show()
-            activity?.finish()
+            Firebase.auth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(activity) { task ->
+                    if (task.isSuccessful) {
+                        Toast.makeText(activity,
+                            "Registro OK!", Toast.LENGTH_LONG).show()
+                        activity.finish()
+                    } else {
+                        Toast.makeText(activity,
+                            "Registro FALHOU!", Toast.LENGTH_LONG).show()
+                    }
+                }
+
         },
-            enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && repeatPassword.isNotEmpty()
+            enabled = email.isNotEmpty() && password.isNotEmpty() &&
+                      password == repeatPassword && password.length >= 6
         ) {
             Text("Cadastrar")
         }
@@ -108,3 +119,4 @@ fun RegisterPage (modifier: Modifier = Modifier) {
         }
     }
 }
+

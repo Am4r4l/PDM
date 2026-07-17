@@ -3,6 +3,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,9 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WeatherApp">
         <activity
-            android:name=".RegisterAcitivity"
+            android:name=".RegisterActivity"
             android:exported="false"
-            android:label="@string/title_activity_register_acitivity"
+            android:label="@string/title_activity_register_activity"
             android:theme="@style/Theme.WeatherApp" />
         <activity
             android:name=".LoginActivity"

@@ -37,6 +37,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.weatherapp.ui.CityDialog
 import com.weatherapp.ui.MainViewModel
 import com.weatherapp.ui.nav.BottomNavBar
@@ -110,7 +112,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HomePage(modifier: Modifier = Modifier) {
+fun HomePage(modifier: Modifier = Modifier, finish: () -> Unit) {
     val activity = LocalActivity.current
     Column(
         modifier = modifier
@@ -133,7 +135,8 @@ fun HomePage(modifier: Modifier = Modifier) {
 
         Button(
             onClick = {
-                activity?.finish()
+                Firebase.auth.signOut()
+                finish()
             },
             modifier = Modifier.fillMaxWidth(0.7f)
         ) {
