@@ -1,23 +1,27 @@
 package com.weatherapp.ui
 
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.model.LatLng
 import com.weatherapp.api.WeatherService
+import com.weatherapp.api.toWeather
 import com.weatherapp.db.fb.FBCity
 import com.weatherapp.db.fb.FBDatabase
 import com.weatherapp.db.fb.FBUser
 import com.weatherapp.db.fb.toFBCity
 import com.weatherapp.model.City
 import com.weatherapp.model.User
+import com.weatherapp.model.Weather
 
 class MainViewModel (private val db: FBDatabase, private val service : WeatherService) : ViewModel(),
     FBDatabase.Listener  {
-    private val _cities = getCities().toMutableStateList()
-    val cities
-        get() = _cities.toList()
+    private val _cities = mutableStateMapOf<String, City>()
+    val cities : List<City>
+        get() = _cities.values.toList().sortedBy { it.name }
+    private val _weather = mutableStateMapOf<String, Weather>()
     private val _user = mutableStateOf<User?> (null)
     val user : User?
         get() = _user.value
@@ -38,13 +42,14 @@ class MainViewModel (private val db: FBDatabase, private val service : WeatherSe
         //TODO("Not yet implemented")
     }
     override fun onCityAdded(city: FBCity) {
-        _cities.add(city.toCity())
+        _cities[city.name!!] = city.toCity()
     }
     override fun onCityUpdated(city: FBCity) {
-        //TODO("Not yet implemented")
+        _cities.remove(city.name)
+        _cities[city.name!!] = city.toCity()
     }
     override fun onCityRemoved(city: FBCity) {
-        _cities.remove(city.toCity())
+        _cities.remove(city.name)
     }
 
     fun addCity(name: String) {
@@ -62,10 +67,24 @@ class MainViewModel (private val db: FBDatabase, private val service : WeatherSe
         }
     }
 
+    fun weather (name: String) = _weather.getOrPut(name) {
+        loadWeather(name)
+        Weather.LOADING // retorno
+    }
+
+    private fun loadWeather(name: String) {
+        service.getWeather(name) { apiWeather ->
+            apiWeather?.let {
+                _weather[name] = apiWeather.toWeather()
+            }
+        }
+    }
+
+
 }
 
 private fun getCities() = List(20) { i ->
-    City(name = "Cidade $i", weather = "Carregando clima...")
+    City(name = "Cidade $i")
 }
 
 class MainViewModelFactory(private val db : FBDatabase, private val service : WeatherService) :

@@ -30,6 +30,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.weatherapp.HomePage
+import com.weatherapp.model.Weather
 import com.weatherapp.ui.theme.WeatherAppTheme
 
 @SuppressLint("UnrememberedMutableState")
@@ -60,29 +61,13 @@ fun MapPage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
 
             viewModel.cities.forEach {
                 if (it.location != null) {
+                    val weather = viewModel.weather(it.name)
+                    val desc = if (weather == Weather.LOADING) "Carregando clima..."
+                    else weather.desc
                     Marker( state = MarkerState(position = it.location),
-                        title = it.name, snippet = "${it.location}")
+                        title = it.name, snippet = desc
+                    )
                 }
             }
-
-            Marker(
-                state = recife,
-                title = "Recife",
-                snippet = "Marcador em Recife",
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)
-            )
-            Marker(
-                state = caruaru,
-                title = "Caruaru",
-                snippet = "Marcador em Caruaru",
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)
-            )
-            Marker(
-                state = joaopessoa,
-                title = "João Pessoa",
-                snippet = "Marcador em João Pessoa",
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)
-            )
-
         }
     }
