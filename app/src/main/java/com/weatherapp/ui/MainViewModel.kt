@@ -1,5 +1,7 @@
 package com.weatherapp.ui
 
+import android.annotation.SuppressLint
+import androidx.browser.browseractions.BrowserServiceFileProvider.loadBitmap
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.toMutableStateList
@@ -92,9 +94,19 @@ class MainViewModel (private val db: FBDatabase, private val service : WeatherSe
         service.getWeather(name) { apiWeather ->
             apiWeather?.let {
                 _weather[name] = apiWeather.toWeather()
+                loadBitmap(name)
             }
         }
     }
+
+    private fun loadBitmap(name: String) {
+        _weather[name]?.let { weather ->
+            service.getBitmap(weather.imgUrl) { bitmap ->
+                _weather[name] = weather.copy(bitmap = bitmap)
+            }
+        }
+    }
+
 
     fun forecast (name: String) = _forecast.getOrPut(name) {
         loadForecast(name)
@@ -108,14 +120,6 @@ class MainViewModel (private val db: FBDatabase, private val service : WeatherSe
             }
         }
     }
-
-
-
-
-}
-
-private fun getCities() = List(20) { i ->
-    City(name = "Cidade $i")
 }
 
 class MainViewModelFactory(private val db : FBDatabase, private val service : WeatherService) :
