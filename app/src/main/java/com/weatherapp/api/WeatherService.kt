@@ -52,4 +52,10 @@ class WeatherService {
         enqueue(call) { onResponse.invoke(it) }
     }
 
+    fun getForecast(name: String, onResponse : (APIWeatherForecast?) -> Unit) {
+        val call: Call<APIWeatherForecast?> = weatherAPI.forecast(name)
+        enqueue(call) { onResponse.invoke(it) }
+    }
+
+
 }

@@ -49,11 +49,12 @@ fun ListPage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
             .padding(8.dp)
     ) {
         items(items = cityList, key = { it.name } ) { city ->
-            CityItem(city = city, weather = viewModel.weather(city.name), onClose = {
+            CityItem(city = city, weather = viewModel.weather(city.name), onClick = {
+                viewModel.city = city.name
+                Toast.makeText(activity, "Cidade aberta", Toast.LENGTH_LONG).show()
+            }, onClose = {
                 viewModel.remove(city)
                 Toast.makeText(activity, "Cidade fechada", Toast.LENGTH_LONG).show()
-            }, onClick = {
-                Toast.makeText(activity, "Cidade aberta", Toast.LENGTH_LONG).show()
             })
         }
     }
