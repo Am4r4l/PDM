@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.weatherapp.HomePage
 import com.weatherapp.model.City
 import com.weatherapp.model.Weather
+import com.weatherapp.ui.nav.Route
 import com.weatherapp.ui.theme.WeatherAppTheme
 
 @Preview(showBackground = true)
@@ -51,7 +52,7 @@ fun ListPage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
         items(items = cityList, key = { it.name } ) { city ->
             CityItem(city = city, weather = viewModel.weather(city.name), onClick = {
                 viewModel.city = city.name
-                Toast.makeText(activity, "Cidade aberta", Toast.LENGTH_LONG).show()
+                viewModel.page = Route.Home
             }, onClose = {
                 viewModel.remove(city)
                 Toast.makeText(activity, "Cidade fechada", Toast.LENGTH_LONG).show()
