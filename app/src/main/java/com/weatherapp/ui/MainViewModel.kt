@@ -11,10 +11,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.weatherapp.api.WeatherService
 import com.weatherapp.api.toForecast
 import com.weatherapp.api.toWeather
-import com.weatherapp.db.fb.FBCity
-import com.weatherapp.db.fb.FBDatabase
-import com.weatherapp.db.fb.FBUser
-import com.weatherapp.db.fb.toFBCity
 import com.weatherapp.model.City
 import com.weatherapp.model.Forecast
 import com.weatherapp.model.User

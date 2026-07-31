@@ -45,9 +45,18 @@ class Repository (private val fbDB: FBDatabase,
             }
         }
     }
-    fun add(city: City) = fbDB.add(city.toFBCity())
-    fun remove(city: City) = fbDB.remove(city.toFBCity())
-    fun update(city: City) = fbDB.update(city.toFBCity())
+    fun add(city: City) {
+        localDB.insert(city.toLocalCity())
+        fbDB.add(city.toFBCity())
+    }
+    fun remove(city: City) {
+        localDB.delete(city.toLocalCity())
+        fbDB.remove(city.toFBCity())
+    }
+    fun update(city: City) {
+        localDB.update(city.toLocalCity())
+        fbDB.update(city.toFBCity())
+    }
     override fun onUserLoaded(user: FBUser)= listener?.onUserLoaded(user.toUser())?:Unit
     override fun onUserSignOut() = listener?.onUserSignOut()?:Unit
     override fun onCityAdded(city: FBCity) {
