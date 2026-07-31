@@ -29,6 +29,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.util.Consumer
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -75,6 +77,7 @@ class MainActivity : ComponentActivity() {
             val viewModel : MainViewModel = viewModel(
                 factory = MainViewModelFactory(repository, weatherService, forecastMonitor)
             )
+            val user = viewModel.user.collectAsStateWithLifecycle(null).value
             DisposableEffect(Unit) {
                 val listener = Consumer<Intent> { intent ->
                     viewModel.city = intent.getStringExtra("city")
@@ -105,6 +108,7 @@ class MainActivity : ComponentActivity() {
             }
 
             WeatherAppTheme {
+                val user by viewModel.user.collectAsState()
                 val fbAuth = Firebase.auth
                 LaunchedEffect(fbAuth.currentUser) {
                     if (fbAuth.currentUser == null) {
@@ -127,7 +131,7 @@ class MainActivity : ComponentActivity() {
                     topBar = {
                         TopAppBar(
                             title = {
-                                val name = viewModel.user?.name?:"[carregando...]"
+                                val name = user?.name?:"[carregando...]"
                                 Text("Bem-vindo/a! $name")
                             },
                             actions = {
