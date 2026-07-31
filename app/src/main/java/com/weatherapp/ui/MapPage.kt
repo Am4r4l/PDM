@@ -32,7 +32,6 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.weatherapp.HomePage
 import com.weatherapp.R
 import com.weatherapp.model.Weather
 import com.weatherapp.ui.theme.WeatherAppTheme

@@ -1,5 +1,6 @@
 package com.weatherapp
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
@@ -26,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.util.Consumer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -43,6 +46,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.weatherapp.api.WeatherService
 import com.weatherapp.db.fb.FBDatabase
+import com.weatherapp.monitor.ForecastMonitor
 import com.weatherapp.ui.CityDialog
 import com.weatherapp.ui.MainViewModel
 import com.weatherapp.ui.MainViewModelFactory
@@ -60,16 +64,51 @@ class MainActivity : ComponentActivity() {
         setContent {
             val fbDB = remember { FBDatabase() }
             val weatherService = remember { WeatherService(this) }
+            val forecastMonitor = remember { ForecastMonitor(this) }
             val viewModel : MainViewModel = viewModel(
-                factory = MainViewModelFactory(fbDB, weatherService)
+                factory = MainViewModelFactory(fbDB, weatherService, forecastMonitor)
             )
+            DisposableEffect(Unit) {
+                val listener = Consumer<Intent> { intent ->
+                    viewModel.city = intent.getStringExtra("city")
+                    viewModel.page = Route.Home
+                }
+                addOnNewIntentListener(listener)
+                onDispose { removeOnNewIntentListener(listener) }
+            }
             var showDialog by remember { mutableStateOf(false) }
             val navController = rememberNavController()
             val currentRoute = navController.currentBackStackEntryAsState()
             val showButton = currentRoute.value?.destination?.hasRoute(Route.List::class) == true
-            val launcher = rememberLauncherForActivityResult(contract =
-                ActivityResultContracts.RequestPermission(), onResult = {} )
+            
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestMultiplePermissions(),
+                onResult = {}
+            )
+            
+            LaunchedEffect(Unit) {
+                val permissions = mutableListOf(
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                    permissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
+                }
+                launcher.launch(permissions.toTypedArray())
+            }
+
             WeatherAppTheme {
+                val fbAuth = Firebase.auth
+                LaunchedEffect(fbAuth.currentUser) {
+                    if (fbAuth.currentUser == null) {
+                        val intent = Intent(this@MainActivity, LoginActivity::class.java).setFlags(
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        )
+                        startActivity(intent)
+                        finish()
+                    }
+                }
+
                 if (showDialog) CityDialog(
                     onDismiss = { showDialog = false },
                     onConfirm = { city ->
@@ -85,7 +124,9 @@ class MainActivity : ComponentActivity() {
                                 Text("Bem-vindo/a! $name")
                             },
                             actions = {
-                                IconButton( onClick = { finish() } ) {
+                                IconButton( onClick = {
+                                    Firebase.auth.signOut()
+                                } ) {
                                     Icon(
                                         imageVector =
                                             Icons.AutoMirrored.Filled.ExitToApp,
@@ -112,7 +153,6 @@ class MainActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        launcher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
                         MainNavHost(navController = navController, viewModel = viewModel)
                     }
                 }
@@ -134,36 +174,4 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun HomePage(modifier: Modifier = Modifier, finish: () -> Unit) {
-    val activity = LocalActivity.current
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Bem-vindo à Home!",
-            fontSize = 28.sp,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        
-        Text(
-            text = "Você está logado no WeatherApp.",
-            fontSize = 18.sp,
-            modifier = Modifier.padding(bottom = 48.dp)
-        )
-
-        Button(
-            onClick = {
-                Firebase.auth.signOut()
-            },
-            modifier = Modifier.fillMaxWidth(0.7f)
-        ) {
-            Text("Sair")
-        }
-    }
-}
 

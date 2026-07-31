@@ -34,12 +34,20 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.weatherapp.ui.theme.WeatherAppTheme
-import kotlin.jvm.java
 
 class LoginActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        Firebase.auth.addAuthStateListener { auth ->
+            if (auth.currentUser != null) {
+                val intent = Intent(this, MainActivity::class.java).setFlags(
+                    FLAG_ACTIVITY_SINGLE_TOP
+                )
+                startActivity(intent)
+                finish()
+            }
+        }
         setContent {
             WeatherAppTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -90,9 +98,15 @@ fun LoginPage(modifier: Modifier = Modifier) {
                 Firebase.auth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(activity) { task ->
                         if (task.isSuccessful) {
+                            activity.startActivity(
+                                Intent(activity, MainActivity::class.java).setFlags(
+                                    FLAG_ACTIVITY_SINGLE_TOP
+                                )
+                            )
                             Toast.makeText(activity, "Login OK!", Toast.LENGTH_LONG).show()
                         } else {
-                            Toast.makeText(activity, "Login FALHOU!", Toast.LENGTH_LONG).show()
+                            val error = task.exception?.localizedMessage ?: "Erro desconhecido"
+                            Toast.makeText(activity, "Login FALHOU: $error", Toast.LENGTH_LONG).show()
                         }
                     }
 
@@ -103,7 +117,7 @@ fun LoginPage(modifier: Modifier = Modifier) {
             }
             androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(horizontal = 4.dp))
             Button( onClick = {
-                activity?.startActivity(
+                activity.startActivity(
                     Intent(activity, RegisterActivity::class.java).setFlags(
                         FLAG_ACTIVITY_SINGLE_TOP
                     )

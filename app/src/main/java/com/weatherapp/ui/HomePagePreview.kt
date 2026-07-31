@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.weatherapp.HomePage
 import com.weatherapp.R
 import com.weatherapp.model.Forecast
 import com.weatherapp.ui.nav.BottomNavItem.HomeButton.icon
@@ -39,8 +38,8 @@ import java.text.DecimalFormat
 
 @Preview(showBackground = true)
 @Composable
-fun HomePage(modifier: Modifier = Modifier,viewModel: MainViewModel) {
-    Column {
+fun HomePage(modifier: Modifier = Modifier, viewModel: MainViewModel) {
+    Column(modifier = modifier) {
         if (viewModel.city == null) {
             Column( modifier = modifier.fillMaxSize()
                 .background(Color.Blue).wrapContentSize(Alignment.Center)

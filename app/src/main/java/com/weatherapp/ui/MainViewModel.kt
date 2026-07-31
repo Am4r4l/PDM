@@ -19,9 +19,10 @@ import com.weatherapp.model.City
 import com.weatherapp.model.Forecast
 import com.weatherapp.model.User
 import com.weatherapp.model.Weather
+import com.weatherapp.monitor.ForecastMonitor
 import com.weatherapp.ui.nav.Route
 
-class MainViewModel (private val db: FBDatabase, private val service : WeatherService) : ViewModel(),
+class MainViewModel (private val db: FBDatabase, private val service : WeatherService, private val monitor: ForecastMonitor) : ViewModel(),
     FBDatabase.Listener  {
     private val _cities = mutableStateMapOf<String, City>()
     val cities : List<City>
@@ -57,17 +58,21 @@ class MainViewModel (private val db: FBDatabase, private val service : WeatherSe
         _user.value = user.toUser()
     }
     override fun onUserSignOut() {
-        //TODO("Not yet implemented")
+        _user.value = null
+        monitor.cancelAll()
     }
     override fun onCityAdded(city: FBCity) {
         _cities[city.name!!] = city.toCity()
+        monitor.updateCity(city.toCity())
     }
     override fun onCityUpdated(city: FBCity) {
         _cities.remove(city.name)
         _cities[city.name!!] = city.toCity()
+        monitor.updateCity(city.toCity())
     }
     override fun onCityRemoved(city: FBCity) {
         _cities.remove(city.name)
+        monitor.cancelCity(city.toCity())
     }
 
     fun addCity(name: String) {
@@ -126,11 +131,11 @@ class MainViewModel (private val db: FBDatabase, private val service : WeatherSe
     }
 }
 
-class MainViewModelFactory(private val db : FBDatabase, private val service : WeatherService) :
+class MainViewModelFactory(private val db : FBDatabase, private val service : WeatherService, private val monitor: ForecastMonitor) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(db, service) as T
+            return MainViewModel(db, service, monitor) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

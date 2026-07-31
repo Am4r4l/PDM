@@ -102,6 +102,7 @@ fun RegisterPage (modifier: Modifier = Modifier) {
                         Toast.makeText(activity,
                             "Registro OK!", Toast.LENGTH_LONG).show()
                         FBDatabase().register(User(name, email).toFBUser())
+                        activity.finish()
                     } else {
                         Toast.makeText(activity,
                             "Registro FALHOU!", Toast.LENGTH_LONG).show()
