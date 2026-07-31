@@ -6,15 +6,12 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     id ("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.devtools.ksp") version "2.3.4"
 }
 
 android {
     namespace = "com.weatherapp"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.weatherapp"
@@ -41,8 +38,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     buildFeatures {
         compose = true
@@ -51,6 +51,11 @@ android {
 }
 
 dependencies {
+    val room_version = "2.8.4"
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+
     implementation("androidx.navigation:navigation-compose:2.9.8")
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.credentials)
