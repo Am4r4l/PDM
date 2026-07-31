@@ -13,10 +13,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Icon
-import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -29,10 +28,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.weatherapp.HomePage
 import com.weatherapp.R
 import com.weatherapp.model.Forecast
+import com.weatherapp.ui.nav.BottomNavItem.HomeButton.icon
 import com.weatherapp.ui.theme.WeatherAppTheme
 import java.text.DecimalFormat
 
@@ -59,8 +60,18 @@ fun HomePage(modifier: Modifier = Modifier,viewModel: MainViewModel) {
                 )
                 Column {
                     Spacer(modifier = modifier.size(12.dp))
-                    Text( text = viewModel.city ?: "Selecione uma cidade...",
-                        fontSize = 28.sp )
+                    val city = viewModel.cities.find { it.name == viewModel.city }
+                    val icon = if (city?.isMonitored == true) Icons.Filled.Notifications
+                               else Icons.Outlined.Notifications
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text( text = viewModel.city ?: "Selecione uma cidade...",
+                            fontSize = 28.sp )
+                        Icon( imageVector = icon, contentDescription = "Monitorada?",
+                            modifier = Modifier.size(32.dp).clickable {
+                                viewModel.update(city = city!!.copy(isMonitored = !city.isMonitored))
+                            }
+                        )
+                    }
                     viewModel.city?.let { name ->
                         val weather = viewModel.weather(name)
                         Spacer(modifier = modifier.size(12.dp))

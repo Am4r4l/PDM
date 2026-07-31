@@ -85,6 +85,10 @@ class MainViewModel (private val db: FBDatabase, private val service : WeatherSe
         }
     }
 
+    fun update(city: City) {
+        db.update(city.toFBCity())
+    }
+
     fun weather (name: String) = _weather.getOrPut(name) {
         loadWeather(name)
         Weather.LOADING // retorno
