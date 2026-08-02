@@ -11,13 +11,6 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 
 class FBDatabase {
-    interface Listener {
-        fun onUserLoaded(user: FBUser)
-        fun onUserSignOut()
-        fun onCityAdded(city: FBCity)
-        fun onCityUpdated(city: FBCity)
-        fun onCityRemoved(city: FBCity)
-    }
     private val auth = Firebase.auth
     private val db = Firebase.firestore
 
